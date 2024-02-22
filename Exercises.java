@@ -106,7 +106,7 @@ class PingPong {
             endNumberScanner = new Scanner(System.in);
             int endNumber = endNumberScanner.nextInt();
 
-            for (int i = startNumber; i < endNumber+1; i++) {
+            for (int i = startNumber; i <= endNumber; i++) {
                 if (i % 3 == 0) {
                     System.out.println("Ping");
                 } else if (i % 5 == 0) {
@@ -126,7 +126,7 @@ Vypište všechny výsledky do konzole
  */
 
 class Cycle {
-    public static void main(String[] args) {cycle();};
+    public static void main(String[] args) {cycle();}
         public static void cycle() {
             int[] pole = {3, 5, 8, 11, 36, 69, 34, 5, 90, 6, 3, 6534, 8, 575, 234};
             for (int i:pole) {
@@ -142,6 +142,27 @@ class Cycle {
     It is denoted by n!.
      */
 
+class Factorial {
+    public static void main(String[] args) {factorial();}
+        public static void factorial() {
+            System.out.println("Zadejte číslo, které chcete převést na faktoriál: ");
+            Scanner userInput;
+            userInput = new Scanner(System.in);
+            int numberInput = userInput.nextInt();
+
+            int f = 1;
+            for (int i=1; i<=numberInput; i++) {
+                f=f*i;
+                //f=1*5
+                //f=1*4
+                //f=1*3
+                //f=1*2
+                //f=1*1
+            }
+            System.out.println("Factorial of your number is : " + f);
+        }
+
+}
 
 
 /*
