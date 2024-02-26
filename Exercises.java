@@ -94,29 +94,38 @@ V případě násobků obojího, napsat PingPong
  */
 
 class PingPong {
-    public static void main(String[] args) {pingPong();}
-        public static void pingPong() {
-            System.out.println("Zadejte počáteční číslo: ");
-            Scanner startNumberScanner;
-            startNumberScanner = new Scanner(System.in);
-            int startNumber = startNumberScanner.nextInt();
+    public static void main(String[] args) {
+        int[] numbers = userInput();
+        conditionsPingPong(numbers[0], numbers[1]);
 
-            System.out.println("Zadejte konečné číslo: ");
-            Scanner endNumberScanner;
-            endNumberScanner = new Scanner(System.in);
-            int endNumber = endNumberScanner.nextInt();
+    }
+    public static int[] userInput() {
+        Scanner scanner = new Scanner(System.in);
 
-            for (int i = startNumber; i <= endNumber; i++) {
-                if (i % 3 == 0) {
-                    System.out.println("Ping");
-                } else if (i % 5 == 0) {
-                    System.out.println("Pong");
-                } else {
-                    System.out.println(i);
-                }
+        System.out.println("Enter the starting number: ");
+        int startNumber = scanner.nextInt();
+
+        System.out.println("Enter the ending number: ");
+        int endNumber = scanner.nextInt();
+
+        return new int[]{startNumber, endNumber};
+    }
+
+    public static void conditionsPingPong(int startNumber, int endNumber) {
+        for (int i = startNumber; i <= endNumber; i++) {
+            if (i % 5 == 0 && i % 3 == 0) {
+                System.out.println("PingPong");
+            } else if (i % 5 == 0) {
+                System.out.println("Pong");
+            } else if (i % 3 == 0) {
+                System.out.println("Ping");
+            } else {
+                System.out.println(i);
             }
+        }
     }
 }
+
 
 /*
 Zadefinujte si pole celých čísel, které bude vypadat následovně
