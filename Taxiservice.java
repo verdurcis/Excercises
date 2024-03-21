@@ -23,31 +23,42 @@ functionality and user experience of the system.
 
 
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.List;
+import java.util.Scanner;
 
 public class Taxiservice {
     public void main(String[] args) {
 
+        // Methods
         selectDisplayDriver selectDriver = new selectDisplayDriver();
         selectDisplayCar selectCar = new selectDisplayCar();
+        assignDriver assignDriver = new assignDriver();
 
-        selectDriver.selectDriver();
+        // Select and display driver
+        Driver driver = selectDriver.selectDriver();
         selectDriver.displayDriverInfo();
 
-        selectCar.selectCar();
+        // Select and display car
+        Car car = selectCar.selectCar();
         selectCar.displayCarInfo();
+
+        assignDriver.assignDriverToCar(driver, car);
+        String assignedInfo = assignDriver.carAssignedInfo(driver, car);
+        System.out.println(assignedInfo);
+        selectDriver.displayDriverInfo();
     }
 
     public static class selectDisplayDriver {
         private String selectedDriver;
 
         // private string common for the entire class (and all methods in there)
-        public void selectDriver() {
+        public Driver selectDriver() {
             // takes user input for driver
             Scanner selectDriver = new Scanner(System.in);
             System.out.println("What driver do you want to assign: ");
-            selectedDriver = selectDriver.next();
+            selectedDriver = selectDriver.nextLine();
+            DriversDatabase driversDatabase = new DriversDatabase();
+            return driversDatabase.getDriver(selectedDriver);
         }
 
         public void displayDriverInfo() {
@@ -62,11 +73,13 @@ public class Taxiservice {
         private String selectedCar;
         // private string common for the entire class (and all methods in there)
 
-        public void selectCar() {
+        public Car selectCar() {
             // takes user input for car
             Scanner selectCar = new Scanner(System.in);
             System.out.println("What car do you want to assign to this user: ");
-            selectedCar = selectCar.next();
+            selectedCar = selectCar.nextLine();
+            CarsDatabase carsDatabase = new CarsDatabase();
+            return carsDatabase.getCar(selectedCar);
         }
 
         public void displayCarInfo() {
@@ -76,67 +89,107 @@ public class Taxiservice {
             System.out.println(taxiInfo);
         }
     }
-}
 
+    public static class assignDriver {
+        public void assignDriverToCar(Driver assignedDriver, Car assignedCar) {
+            CarsDatabase carsDatabase = new CarsDatabase();
+            DriversDatabase driversDatabase = new DriversDatabase();
+            Car car = carsDatabase.getCar(assignedCar.getCarModel());
+            Driver driver = driversDatabase.getDriver(assignedDriver.getDriversFirstName());
 
-// declaration of a driver
-class Driver {
-    String name;
-    String surname;
-    int drivingId;
-    // TODO assigned car
-
-    Driver(String name, String surname, int drivingId) {
-        this.name = name;
-        this.surname = surname;
-        this.drivingId = drivingId;
-    }
-
-    public String getDriversSurname() {return this.surname;};
-    public String getDriversFirstName() {return this.name;};
-    public int getDriversDrivingId() {return this.drivingId;};
-    // TODO public String assignedCar() {return this.surname;};
-
-
-    public String driversInfo() {
-        return STR."\n Driver's first name is: \{name} \n Driver's last name is: \{surname} \n Their driving id is: \{drivingId}";
-    }
-}
-
-// drivers database
-class DriversDatabase {
-    private List<Driver> drivers;
-
-    public DriversDatabase() {
-        drivers = new ArrayList<>();
-        drivers.add(new Driver("Earnest", "George", 1009848));
-        drivers.add(new Driver("Raymond", "Curry", 1105281));
-        drivers.add(new Driver("Leroy", "Owen", 1017937));
-        drivers.add(new Driver("Marie", "Farmer", 1015657));
-        drivers.add(new Driver("Myra", "Burgess", 1091200));
-        drivers.add(new Driver("Darrin", "Johnson", 1104769));
-        drivers.add(new Driver("Cecil", "Woods", 1105601));
-        drivers.add(new Driver("Luz", "Schultz", 1101591));
-        drivers.add(new Driver("Eugene", "Patrick", 1035964));
-        drivers.add(new Driver("Michelle", "Casey", 1098796));
-    }
-
-    public String getDriversInfo (String selectedDriver) {
-        for (Driver driver : drivers) {
-            if ((driver.getDriversSurname().equalsIgnoreCase(selectedDriver)) || (driver.getDriversFirstName().equalsIgnoreCase(selectedDriver))) {
-                return STR."You have selected a driver. \{driver.driversInfo()}";
+            if (car != null && driver != null) {
+                car.setAssignedDriver(assignedDriver.getDriversSurname());
+                driver.setAssignedCar(assignedCar.getCarModel());
+            } else {
+                System.out.println("Driver or car has not been found, therefore cannot be assigned.");
             }
         }
-        return "This driver has not been found. Try again.";
-    }
-}
 
-// declaration of a car
-class Car {
+        public String carAssignedInfo(Driver assignedDriver, Car assignedCar) {
+            if (assignedCar != null && assignedDriver != null) {
+                return STR."Driver named \{assignedDriver.name} \{assignedDriver.surname} has been assigned to this car: \{assignedCar.model}.";
+            } else {
+                return "Driver or car has not been found, therefore cannot be assigned.";
+            }
+        }
+    }
+
+
+    // declaration of a driver
+    static class Driver {
+        String name;
+        String surname;
+        int drivingId;
+        String assignedCar;
+        // assigned car can be declared here but not initiated in the constructor!
+
+        public Driver(String name, String surname, int drivingId) {
+            this.name = name;
+            this.surname = surname;
+            this.drivingId = drivingId;
+        }
+
+        public String getDriversSurname() {
+            return this.surname;
+        }
+
+        public String getDriversFirstName() {
+            return this.name;
+        }
+
+        public void setAssignedCar(String assignedCar) {
+            this.assignedCar = assignedCar;
+        }
+
+        public String driversInfo() {
+            return STR."\n Driver's first name is: \{name} \n Driver's last name is: \{surname} \n Their driving id is: \{drivingId} \n Their assigned car is \{assignedCar}";
+        }
+    }
+
+    // drivers database
+    static class DriversDatabase {
+        private List<Driver> drivers;
+
+        public DriversDatabase() {
+            drivers = new ArrayList<>();
+            drivers.add(new Driver("Earnest", "George", 1009848));
+            drivers.add(new Driver("Raymond", "Curry", 1105281));
+            drivers.add(new Driver("Leroy", "Owen", 1017937));
+            drivers.add(new Driver("Marie", "Farmer", 1015657));
+            drivers.add(new Driver("Myra", "Burgess", 1091200));
+            drivers.add(new Driver("Darrin", "Johnson", 1104769));
+            drivers.add(new Driver("Cecil", "Woods", 1105601));
+            drivers.add(new Driver("Luz", "Schultz", 1101591));
+            drivers.add(new Driver("Eugene", "Patrick", 1035964));
+            drivers.add(new Driver("Michelle", "Casey", 1098796));
+        }
+
+        public Driver getDriver (String selectedDriver) {
+            selectedDriver = selectedDriver.trim();
+            for (Driver driver : drivers) {
+                if ((driver.getDriversSurname().equalsIgnoreCase(selectedDriver)) || (driver.getDriversFirstName().equalsIgnoreCase(selectedDriver))) {
+                    return driver;
+                }
+            } return null;
+        }
+        public String getDriversInfo(String selectedDriver) {
+            selectedDriver = selectedDriver.trim();
+            for (Driver driver : drivers) {
+                if ((driver.getDriversSurname().equalsIgnoreCase(selectedDriver)) || (driver.getDriversFirstName().equalsIgnoreCase(selectedDriver))) {
+                    return STR."You have selected a driver. \{driver.driversInfo()}";
+                }
+            }
+            return "This driver has not been found. Try again.";
+        }
+    }
+
+    // declaration of a car
+    static class Car {
         int make;
         String model;
         String plateNumber;
-        // TODO assigned driver
+        String assignedDriver;
+        // assigned driver can be declared here but not initiated in the constructor!
 
         Car(int make, String model, String plateNumber) {
             this.make = make;
@@ -144,18 +197,28 @@ class Car {
             this.plateNumber = plateNumber;
         }
 
-        public String getCarModel() {return this.model;};
-        public String getPlateNumber() {return this.plateNumber;};
+        public String getCarModel() {
+            return this.model;
+        }
+
+        public String getPlateNumber() {
+            return this.plateNumber;
+        }
+
+        public void setAssignedDriver(String assignedDriver) {
+            this.assignedDriver = assignedDriver;
+        }
 
         public String carInfo() {
-        return STR."\n Car model is: \{model} \n Plate number is: \{plateNumber} \n This car was make in:  \{make}";
+            return STR."\n Car model is: \{model} \n Plate number is: \{plateNumber} \n This car was make in:  \{make} \n Their assigned driver is: \{assignedDriver} ";
+        }
     }
-}
 
-// car database
-class CarsDatabase {
+    // Cars database
+    static class CarsDatabase {
         private List<Car> cars;
-        public CarsDatabase(){
+
+        public CarsDatabase() {
             cars = new ArrayList<>();
             cars.add(new Car(2020, "Porsche Cayenne", "54377J"));
             cars.add(new Car(2023, "Mitsubishi ASX", "WZL8392"));
@@ -169,41 +232,62 @@ class CarsDatabase {
             cars.add(new Car(2018, "Lincoln MKZ", "4358 YW"));
         }
 
-    public String getCarInfo (String selectedCar) {
-        for (Car car : cars) {
-
-            car.model.replaceAll("\\s", "");
-            car.plateNumber.replaceAll("\\s", "");
-
-            if ((car.getCarModel().equalsIgnoreCase(selectedCar)) || (car.getPlateNumber().equalsIgnoreCase(selectedCar))) {
-                return STR."You have selected a taxi car for your driver. \{car.carInfo()}";
-            }
+        public Car getCar (String selectedCar) {
+            selectedCar = selectedCar.trim();
+            for (Car car : cars) {
+                if ((car.getCarModel().equalsIgnoreCase(selectedCar)) || (car.getPlateNumber().equalsIgnoreCase(selectedCar))) {
+                    return car;
+                }
+            } return null;
         }
-        return "This taxi car has not been found. Try again.";
+        public String getCarInfo (String selectedCar) {
+            selectedCar = selectedCar.trim();
+            for (Car car : cars) {
+                if ((car.getCarModel().equalsIgnoreCase(selectedCar)) || (car.getPlateNumber().equalsIgnoreCase(selectedCar))) {
+                    return STR."You have selected a taxi car for your driver. \{car.carInfo()}";
+                }
+            }
+            return "This taxi car has not been found. Try again.";
+        }
     }
 }
 
 
+/*
 
 // declaration of parking
 class Parking {
         String locationName;
         boolean availability;
-        // TODO list of parked cars
+        List<ParkedCars> parkedCars;
 
-        Parking(String locationName, boolean availability) {
+
+        Parking(String locationName, boolean availability, List<ParkedCars> parkedCars) {
             this.locationName = locationName;
             this.availability = availability;
+            this.parkedCars = parkedCars;
         }
+
+
 
         public String getParking() {return this.locationName;};
 }
 
 
-    class ParkingDatabase {
+class ParkingDatabase {
+    private List <Parking> parking;
+    public ParkingDatabase() {
+        parking = new ArrayList<>();
+        parking.add(new Parking("Touchdown Parking Lot", true ));
+
         Parking touchdown = new Parking("Touchdown Parking Lot", true);
         Parking grapefruit = new Parking("Grapefruit Parking Garage", false);
         Parking homeDepot = new Parking("The Home Parking Depot Parking Lot", true);
         Parking pelican = new Parking("Pelican Lot", true);
         Parking floridaEve = new Parking("513 S Florida Eve Parking", false);
+
     }
+}
+
+ */
+
